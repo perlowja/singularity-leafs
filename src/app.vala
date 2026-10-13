@@ -357,6 +357,7 @@ namespace Singularity.Apps {
                     if (settings.get_string ("color-scheme") == "auto")
                         apply_settings_to_all ();
                 });
+                desktop_settings.changed["background-effect"].connect ((_k) => apply_settings_to_all ());
             }
             track_global_menu ();
             Singularity.Style.ThemeMode.get_default ().changed.connect (() => {
@@ -370,6 +371,7 @@ namespace Singularity.Apps {
             });
 
             sync_window_chrome ();
+            install_glass_frame ();
         }
 
         protected override void activate () {
@@ -1125,6 +1127,14 @@ namespace Singularity.Apps {
                 theme = Singularity.Core.TerminalThemes.get_by_id ("onedark");
             return theme != null
                 && Singularity.Core.TerminalThemes.is_dark_background (theme.background);
+        }
+
+        private void install_glass_frame () {
+            var display = Gdk.Display.get_default ();
+            if (display == null) return;
+            var provider = new Gtk.CssProvider ();
+            provider.load_from_string (".singularity-blur .singularity-app-frame, .singularity-glass .singularity-app-frame, .singularity-blur vte-terminal, .singularity-glass vte-terminal { background-color: transparent; }");
+            Gtk.StyleContext.add_provider_for_display (display, provider, Gtk.STYLE_PROVIDER_PRIORITY_USER + 2);
         }
 
         private void sync_window_chrome () {

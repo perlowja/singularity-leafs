@@ -574,6 +574,7 @@ esac
             if (theme != null) {
                 Gdk.RGBA bg = Gdk.RGBA (), fg = Gdk.RGBA ();
                 bg.parse (theme.background);
+                bg.alpha = (float) background_alpha ();
                 fg.parse (theme.foreground);
                 Gdk.RGBA[] palette = new Gdk.RGBA[16];
                 for (int i = 0; i < 16; i++) {
@@ -581,6 +582,16 @@ esac
                     palette[i].parse (theme.palette[i]);
                 }
                 vte.set_colors (fg, bg, palette);
+            }
+        }
+
+        private static double background_alpha () {
+            var desktop = Singularity.Core.safe_settings ("dev.sinty.desktop");
+            switch (Singularity.Style.BackgroundEffect.read (desktop)) {
+                case Singularity.Style.BackgroundEffectMode.LIQUID: return 0.62;
+                case Singularity.Style.BackgroundEffectMode.GLASS: return 0.72;
+                case Singularity.Style.BackgroundEffectMode.BLUR: return 0.78;
+                default: return 1.0;
             }
         }
 
